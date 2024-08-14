@@ -15,7 +15,7 @@ export const fetchToilets = async (
     const response = await axios.post(
       `${API_URL}?apikey=${API_KEY}`,
       {
-        query,
+        query: 'baths',
         pageNumber,
         size,
         additionalPages,
