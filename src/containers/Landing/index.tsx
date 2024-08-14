@@ -2,36 +2,12 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useProducts } from '../../queries';
+import { formatFiltersForService } from '../../utils/filterUtils';
 import Pagination from './sections/Pagination';
 import Products from './sections/Products';
 import Sidebar from './sections/Sidebar';
 
 const pageSizeOptions = [20, 30, 50, 100];
-
-const formatFiltersForService = (
-  selectedFilters: { [key: string]: string[] },
-  facets: any[],
-) => {
-  const formattedFilters: { [key: string]: any[] } = {};
-
-  Object.entries(selectedFilters).forEach(([facetIdentifier, values]) => {
-    const facet = facets.find((f) => f.identifier === facetIdentifier);
-    if (facet) {
-      formattedFilters[facetIdentifier] = values
-        .map((value) => {
-          const option = facet.options.find(
-            (opt: any) => opt.displayValue === value,
-          );
-          return option
-            ? { identifier: option.identifier, value: option.value }
-            : null;
-        })
-        .filter(Boolean);
-    }
-  });
-
-  return formattedFilters;
-};
 
 const Landing: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
@@ -131,7 +107,7 @@ const Landing: React.FC = () => {
   }
 
   if (error) {
-    return <p>Error loading toilets</p>;
+    return <p>Error loading products</p>;
   }
 
   return (
