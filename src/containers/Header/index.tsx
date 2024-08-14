@@ -1,8 +1,8 @@
 const Header = () => {
   return (
-    <div>
-      <div>header</div>
-    </div>
+    <header className="flex h-10 w-full items-center justify-center bg-neutral-200">
+      <p>Header content</p>
+    </header>
   );
 };
 

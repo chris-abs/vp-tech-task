@@ -8,7 +8,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] min-h-[100dvh] bg-red-100">
+    <div className="grid min-h-[100dvh] grid-rows-[auto_1fr_auto]">
       <Header />
       <main>{children}</main>
       <Footer />
