@@ -18,7 +18,7 @@ interface SidebarProps {
   facets: Facet[];
   selectedFilters: { [key: string]: string[] };
   toggleFilter: (facetIdentifier: string, optionValue: string) => void;
-  clearFilters: () => void; // New prop for clearing filters
+  clearFilters: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({

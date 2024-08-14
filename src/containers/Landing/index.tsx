@@ -1,19 +1,46 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import queryString from 'query-string';
 
-import { useToilets } from '../../queries';
+import { useProducts } from '../../queries';
 import Pagination from './sections/Pagination';
 import Products from './sections/Products';
 import Sidebar from './sections/Sidebar';
 
-const pageSizeOptions = [10, 20, 30, 50, 100];
+const pageSizeOptions = [20, 30, 50, 100];
+
+const formatFiltersForService = (
+  selectedFilters: { [key: string]: string[] },
+  facets: any[],
+) => {
+  const formattedFilters: { [key: string]: any[] } = {};
+
+  Object.entries(selectedFilters).forEach(([facetIdentifier, values]) => {
+    const facet = facets.find((f) => f.identifier === facetIdentifier);
+    if (facet) {
+      formattedFilters[facetIdentifier] = values
+        .map((value) => {
+          const option = facet.options.find(
+            (opt: any) => opt.displayValue === value,
+          );
+          return option
+            ? { identifier: option.identifier, value: option.value }
+            : null;
+        })
+        .filter(Boolean);
+    }
+  });
+
+  return formattedFilters;
+};
 
 const Landing: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
+  }>({});
+  const [formattedFilters, setFormattedFilters] = useState<{
+    [key: string]: any[];
   }>({});
 
   const location = useLocation();
@@ -31,11 +58,24 @@ const Landing: React.FC = () => {
     setSelectedFilters(filters);
   }, [location.search]);
 
-  const { data, isLoading, error } = useToilets(
-    'toilets',
+  const { data, isLoading, error } = useProducts(
+    'products',
     pageNumber,
     pageSize,
+    0,
+    1,
+    formattedFilters,
   );
+
+  useEffect(() => {
+    if (data) {
+      const filters = formatFiltersForService(
+        selectedFilters,
+        data.facets || [],
+      );
+      setFormattedFilters(filters);
+    }
+  }, [data, selectedFilters]);
 
   const totalPages = Math.ceil((data?.pagination?.total || 0) / pageSize);
 
@@ -59,12 +99,10 @@ const Landing: React.FC = () => {
       const currentFilters = prevFilters[facetIdentifier] || [];
       const isSelected = currentFilters.includes(optionValue);
 
-      // If the option is selected, remove it from the array; otherwise, add it.
       const updatedFilters = isSelected
         ? currentFilters.filter((value) => value !== optionValue)
         : [...currentFilters, optionValue];
 
-      // If the updated filters array is empty, remove the filter key; otherwise, update it.
       const newFilters = { ...prevFilters };
       if (updatedFilters.length > 0) {
         newFilters[facetIdentifier] = updatedFilters;
@@ -72,7 +110,6 @@ const Landing: React.FC = () => {
         delete newFilters[facetIdentifier];
       }
 
-      // Update the URL with the new filter set
       const searchParams = new URLSearchParams();
       Object.keys(newFilters).forEach((key) => {
         newFilters[key].forEach((value) => searchParams.append(key, value));
@@ -99,7 +136,7 @@ const Landing: React.FC = () => {
 
   return (
     <section className="flex flex-col p-4">
-      <div className="flex gap-2">
+      <div className="flex">
         <Sidebar
           facets={data?.facets || []}
           toggleFilter={toggleFilter}
