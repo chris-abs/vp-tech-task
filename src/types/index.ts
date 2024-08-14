@@ -15,3 +15,17 @@ export interface Product {
     };
   };
 }
+
+export interface FacetOption {
+  identifier: string;
+  value: any;
+  displayValue: string;
+}
+
+export interface Facet {
+  identifier: string;
+  displayName: string;
+  priority: number;
+  options: FacetOption[];
+  facetType: number;
+}

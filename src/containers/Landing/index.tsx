@@ -112,7 +112,7 @@ const Landing: React.FC = () => {
 
   return (
     <section className="flex flex-col p-4">
-      <div className="flex">
+      <div className="flex gap-2">
         <Sidebar
           facets={data?.facets || []}
           toggleFilter={toggleFilter}
