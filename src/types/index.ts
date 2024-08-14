@@ -10,5 +10,8 @@ export interface Product {
   };
   image: {
     url: string;
+    attributes: {
+      imgAltText: string;
+    };
   };
 }

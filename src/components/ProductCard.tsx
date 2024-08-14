@@ -19,7 +19,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             height={300}
             className="h-full w-full transform object-cover transition duration-200 ease-out group-hover:scale-110"
             src={product.image.url}
-            alt={product.productName}
+            alt={product.image.attributes.imgAltText}
           />
           <figcaption className="absolute right-3 top-3 flex items-center rounded bg-white p-1 text-xs">
             <MdOutlineStar />

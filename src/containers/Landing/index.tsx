@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useToilets } from '../../queries';
 import Pagination from './sections/Pagination';
 import Products from './sections/Products';
+import Sidebar from './sections/Sidebar';
 
 const pageSizeOptions = [10, 20, 30, 50, 100];
 
@@ -15,6 +16,8 @@ const Landing: React.FC = () => {
     pageNumber,
     pageSize,
   );
+
+  console.log(data);
 
   const totalPages = Math.ceil((data?.pagination?.total || 0) / pageSize);
 
@@ -41,20 +44,26 @@ const Landing: React.FC = () => {
     return <p>Error loading toilets</p>;
   }
 
+  console.log(data);
+
   return (
     <section className="flex flex-col p-4">
-      <Pagination
-        pageNumber={pageNumber}
-        totalPages={totalPages}
-        pageSize={pageSize}
-        pageSizeOptions={pageSizeOptions}
-        handlePageSizeChange={handlePageSizeChange}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-        totalProducts={data?.pagination?.total || 0}
-      />
-
-      <Products products={data?.products || []} />
+      <div className="flex">
+        <Sidebar facets={data?.facets || []} />
+        <div className="flex-1">
+          <Pagination
+            pageNumber={pageNumber}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            pageSizeOptions={pageSizeOptions}
+            handlePageSizeChange={handlePageSizeChange}
+            handlePreviousPage={handlePreviousPage}
+            handleNextPage={handleNextPage}
+            totalProducts={data?.pagination?.total || 0}
+          />
+          <Products products={data?.products || []} />
+        </div>
+      </div>
     </section>
   );
 };
