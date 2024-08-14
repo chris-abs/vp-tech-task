@@ -10,7 +10,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="grid min-h-[100dvh] grid-rows-[auto_1fr_auto]">
       <Header />
-      <main>{children}</main>
+      <main className="bg-neutral-100">{children}</main>
       <Footer />
     </div>
   );
