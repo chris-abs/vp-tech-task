@@ -1,9 +1,12 @@
 import { MdOutlineFilterListOff } from 'react-icons/md';
-import { Facet, FacetOption } from '../../../types';
+import type {
+  Facet as ProductFacet,
+  FacetOption as ProductFacetOption,
+} from '../../../types';
 
 interface SidebarProps {
-  facets: Facet[];
-  selectedFilters: { [key: string]: string[] };
+  facets: ProductFacet[];
+  selectedFilters: Record<string, string[]>;
   toggleFilter: (facetIdentifier: string, optionValue: string) => void;
   clearFilters: () => void;
 }
@@ -28,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {facets.map((facet) => (
         <div key={facet.identifier} className="mb-6">
           <h3 className="mb-2 font-semibold">{facet.displayName}</h3>
-          {facet.options.map((option: FacetOption) => (
+          {facet.options.map((option: ProductFacetOption) => (
             <label key={option.identifier} className="mb-2 flex items-center">
               <input
                 type="checkbox"

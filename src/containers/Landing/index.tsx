@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useProducts } from '../../queries';
@@ -12,19 +12,19 @@ const pageSizeOptions = [20, 30, 50, 100];
 const Landing: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
-  const [selectedFilters, setSelectedFilters] = useState<{
-    [key: string]: string[];
-  }>({});
-  const [formattedFilters, setFormattedFilters] = useState<{
-    [key: string]: any[];
-  }>({});
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({});
+  const [formattedFilters, setFormattedFilters] = useState<
+    Record<string, any[]>
+  >({});
 
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const filters: { [key: string]: string[] } = {};
+    const filters: Record<string, string[]> = {};
     searchParams.forEach((value, key) => {
       if (!filters[key]) {
         filters[key] = [];
@@ -53,7 +53,10 @@ const Landing: React.FC = () => {
     }
   }, [data, selectedFilters]);
 
-  const totalPages = Math.ceil((data?.pagination?.total || 0) / pageSize);
+  const totalPages = useMemo(
+    () => Math.ceil((data?.pagination?.total || 0) / pageSize),
+    [data?.pagination?.total, pageSize],
+  );
 
   const handlePageSizeChange = (
     event: React.ChangeEvent<HTMLSelectElement>,

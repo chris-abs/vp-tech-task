@@ -1,4 +1,3 @@
-import React from 'react';
 import { FaArrowLeftLong, FaArrowRightLong } from 'react-icons/fa6';
 
 interface PaginationProps {
