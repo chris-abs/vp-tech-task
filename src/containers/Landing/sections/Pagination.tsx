@@ -23,7 +23,7 @@ const Pagination: React.FC<PaginationProps> = ({
   totalProducts,
 }) => {
   return (
-    <div className="mb-4 flex items-center justify-between">
+    <section className="mb-4 flex items-center justify-between">
       <div>
         <label htmlFor="pageSize" className="mr-2">
           Show per page:
@@ -73,7 +73,7 @@ const Pagination: React.FC<PaginationProps> = ({
           </button>
         </div>
       </nav>
-    </div>
+    </section>
   );
 };
 
