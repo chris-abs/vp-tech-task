@@ -1,8 +1,8 @@
 export const formatFiltersForService = (
-  selectedFilters: { [key: string]: string[] },
+  selectedFilters: Record<string, string[]>,
   facets: any[],
-) => {
-  const formattedFilters: { [key: string]: any[] } = {};
+): Record<string, any[]> => {
+  const formattedFilters: Record<string, any[]> = {};
 
   Object.entries(selectedFilters).forEach(([facetIdentifier, values]) => {
     const facet = facets.find((f) => f.identifier === facetIdentifier);
@@ -21,4 +21,17 @@ export const formatFiltersForService = (
   });
 
   return formattedFilters;
+};
+
+export const syncFiltersWithURL = (
+  location: URLSearchParams,
+): Record<string, string[]> => {
+  const filters: Record<string, string[]> = {};
+  location.forEach((value, key) => {
+    if (!filters[key]) {
+      filters[key] = [];
+    }
+    filters[key].push(value);
+  });
+  return filters;
 };

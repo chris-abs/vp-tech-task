@@ -1,8 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useReducer } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useProducts } from '../../queries';
-import { formatFiltersForService } from '../../utils/filterUtils';
+import {
+  formatFiltersForService,
+  syncFiltersWithURL,
+} from '../../utils/filterUtils';
+import { filtersReducer, initialState } from '../../reducers/filersReducer';
 import Pagination from './sections/Pagination';
 import Products from './sections/Products';
 import Sidebar from './sections/Sidebar';
@@ -10,28 +14,18 @@ import Sidebar from './sections/Sidebar';
 const pageSizeOptions = [20, 30, 50, 100];
 
 const Landing: React.FC = () => {
+  const [state, dispatch] = useReducer(filtersReducer, initialState);
+  const { selectedFilters, formattedFilters } = state;
+
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize, setPageSize] = useState(pageSizeOptions[0]);
-  const [selectedFilters, setSelectedFilters] = useState<
-    Record<string, string[]>
-  >({});
-  const [formattedFilters, setFormattedFilters] = useState<
-    Record<string, any[]>
-  >({});
 
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const filters: Record<string, string[]> = {};
-    searchParams.forEach((value, key) => {
-      if (!filters[key]) {
-        filters[key] = [];
-      }
-      filters[key].push(value);
-    });
-    setSelectedFilters(filters);
+    const filters = syncFiltersWithURL(new URLSearchParams(location.search));
+    dispatch({ type: 'SET_FILTERS', payload: filters });
   }, [location.search]);
 
   const { data, isLoading, error } = useProducts(
@@ -49,7 +43,7 @@ const Landing: React.FC = () => {
         selectedFilters,
         data.facets || [],
       );
-      setFormattedFilters(filters);
+      dispatch({ type: 'UPDATE_FORMATTED_FILTERS', payload: filters });
     }
   }, [data, selectedFilters]);
 
@@ -74,34 +68,32 @@ const Landing: React.FC = () => {
   };
 
   const toggleFilter = (facetIdentifier: string, optionValue: string) => {
-    setSelectedFilters((prevFilters) => {
-      const currentFilters = prevFilters[facetIdentifier] || [];
-      const isSelected = currentFilters.includes(optionValue);
+    const currentFilters = selectedFilters[facetIdentifier] || [];
+    const isSelected = currentFilters.includes(optionValue);
 
-      const updatedFilters = isSelected
-        ? currentFilters.filter((value) => value !== optionValue)
-        : [...currentFilters, optionValue];
+    const updatedFilters = isSelected
+      ? currentFilters.filter((value) => value !== optionValue)
+      : [...currentFilters, optionValue];
 
-      const newFilters = { ...prevFilters };
-      if (updatedFilters.length > 0) {
-        newFilters[facetIdentifier] = updatedFilters;
-      } else {
-        delete newFilters[facetIdentifier];
-      }
+    const newFilters = { ...selectedFilters };
+    if (updatedFilters.length > 0) {
+      newFilters[facetIdentifier] = updatedFilters;
+    } else {
+      delete newFilters[facetIdentifier];
+    }
 
-      const searchParams = new URLSearchParams();
-      Object.keys(newFilters).forEach((key) => {
-        newFilters[key].forEach((value) => searchParams.append(key, value));
-      });
+    dispatch({ type: 'SET_FILTERS', payload: newFilters });
 
-      navigate(`?${searchParams.toString()}`);
-
-      return newFilters;
+    const searchParams = new URLSearchParams();
+    Object.keys(newFilters).forEach((key) => {
+      newFilters[key].forEach((value) => searchParams.append(key, value));
     });
+
+    navigate(`?${searchParams.toString()}`);
   };
 
   const clearFilters = () => {
-    setSelectedFilters({});
+    dispatch({ type: 'CLEAR_FILTERS' });
     navigate(location.pathname);
   };
 
